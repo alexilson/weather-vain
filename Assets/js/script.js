@@ -13,7 +13,17 @@ function submitData() {
         return response.json();
     })
     .then(function (data) {
-        console.log(data);
+        if (data) {
+            for (let i = 0; i < data.length; ++i) {
+                if (data[i].state) {
+                    console.log(data[i].name + ", " + data[i].state + ", " + data[i].country)
+                }
+                else {
+                    console.log(data[i].name + ", " + data[i].country)
+                }
+            }
+        }
+
     });
 }
 
