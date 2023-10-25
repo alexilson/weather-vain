@@ -4,12 +4,10 @@ const searchOutputEl = $('#search-output')
 
 function submitData() {
     inputValue = searchStringEl.val();
-    console.log(searchStringEl.val())
     if (inputValue.length < 3) {
         return;
     }
     const apiGeocodingURL = `http://api.openweathermap.org/geo/1.0/direct?q=${inputValue}&limit=5&appid=${apiKey}`
-    console.log(apiGeocodingURL);
     fetch(apiGeocodingURL)
         .then(function (response) {
             return response.json();
@@ -31,13 +29,10 @@ function submitData() {
                     searchOutputEl.append(outputListEl);
                 }
             }
-
         });
 }
 
-searchStringEl.on("input", submitData)
-
-searchOutputEl.on("click", ".search-result", function() {
+function getWeatherData() {
     searchOutputEl.empty();
     const selectedEl = $(this);
     const latSelect = selectedEl.attr("lat");
@@ -48,6 +43,11 @@ searchOutputEl.on("click", ".search-result", function() {
             return response.json();
         })
         .then(function (data) {
+            console.log(data)
             console.log(data.list[0].main.temp);
         })
-})
+}
+
+searchStringEl.on("input", submitData)
+
+searchOutputEl.on("click", ".search-result", getWeatherData)
