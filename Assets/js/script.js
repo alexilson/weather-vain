@@ -20,15 +20,14 @@ function submitData() {
                 for (let i = 0; i < data.length; ++i) {
                     const outputListEl = $('<div>');
                     if (data[i].state) {
-                        console.log(data[i].name + ", " + data[i].state + ", " + data[i].country);
-                        outputListEl.text(data[i].name + ", " + data[i].state + ", " + data[i].country + "\nLongitude: " + data[i].lon + "\nLatitude: " + data[i].lat);
+                        outputListEl.text(data[i].name + ", " + data[i].state + ", " + data[i].country);
                     }
                     else {
-                        console.log(data[i].name + ", " + data[i].country);
-                        outputListEl.text(data[i].name + ", " + data[i].country + "\nLongitude: " + data[i].lon + "\nLatitude: " + data[i].lat);
+                        outputListEl.text(data[i].name + ", " + data[i].country);
                     }
-                    const apiWeatherURL = `api.openweathermap.org/data/2.5/forecast?lat=${data[i].lat}&lon=${data[i].lon}&appid=${apiKey}`;
-                    console.log(apiWeatherURL);
+                    outputListEl.addClass('search-result')
+                    outputListEl.attr('lon', data[i].lon);
+                    outputListEl.attr('lat', data[i].lat);
                     searchOutputEl.append(outputListEl);
                 }
             }
@@ -38,4 +37,17 @@ function submitData() {
 
 searchStringEl.on("input", submitData)
 
-// https://api.openweathermap.org/data/2.5/forecast?q=portland&units=imperial&appid=3f72ddeed10ffe4814723bf1b93c4536
+searchOutputEl.on("click", ".search-result", function() {
+    searchOutputEl.empty();
+    const selectedEl = $(this);
+    const latSelect = selectedEl.attr("lat");
+    const lonSelect = selectedEl.attr("lon");
+    const apiWeatherURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${latSelect}&lon=${lonSelect}&units=imperial&appid=${apiKey}`;
+    fetch (apiWeatherURL)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            console.log(data.list[0].main.temp);
+        })
+})
