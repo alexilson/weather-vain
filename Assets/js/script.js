@@ -1,6 +1,6 @@
 const apiKey = "3f72ddeed10ffe4814723bf1b93c4536";
 const searchStringEl = $('#search-string')
-const outputEl = $('#output')
+const searchOutputEl = $('#search-output')
 
 function submitData() {
     inputValue = searchStringEl.val();
@@ -16,18 +16,20 @@ function submitData() {
         })
         .then(function (data) {
             if (data.length > 0) {
-                outputEl.empty();
+                searchOutputEl.empty();
                 for (let i = 0; i < data.length; ++i) {
-                    const outputListEl = $('<li>');
+                    const outputListEl = $('<div>');
                     if (data[i].state) {
                         console.log(data[i].name + ", " + data[i].state + ", " + data[i].country);
-                        outputListEl.text(data[i].name + ", " + data[i].state + ", " + data[i].country);
+                        outputListEl.text(data[i].name + ", " + data[i].state + ", " + data[i].country + "\nLongitude: " + data[i].lon + "\nLatitude: " + data[i].lat);
                     }
                     else {
                         console.log(data[i].name + ", " + data[i].country);
-                        outputListEl.text(data[i].name + ", " + data[i].country);
+                        outputListEl.text(data[i].name + ", " + data[i].country + "\nLongitude: " + data[i].lon + "\nLatitude: " + data[i].lat);
                     }
-                    outputEl.append(outputListEl);
+                    const apiWeatherURL = `api.openweathermap.org/data/2.5/forecast?lat=${data[i].lat}&lon=${data[i].lon}&appid=${apiKey}`;
+                    console.log(apiWeatherURL);
+                    searchOutputEl.append(outputListEl);
                 }
             }
 
