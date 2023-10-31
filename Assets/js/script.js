@@ -1,13 +1,13 @@
 const apiKey = "3f72ddeed10ffe4814723bf1b93c4536";
-const searchStringEl = $('#search-string')
-const searchOutputEl = $('#search-output')
+const searchStringEl = $('#search-string');
+const searchOutputEl = $('#search-output');
 
 function submitData() {
     inputValue = searchStringEl.val();
     if (inputValue.length < 3) {
         return;
     }
-    const apiGeocodingURL = `http://api.openweathermap.org/geo/1.0/direct?q=${inputValue}&limit=5&appid=${apiKey}`
+    const apiGeocodingURL = `https://api.openweathermap.org/geo/1.0/direct?q=${inputValue}&limit=5&appid=${apiKey}`
     fetch(apiGeocodingURL)
         .then(function (response) {
             return response.json();
@@ -23,7 +23,7 @@ function submitData() {
                     else {
                         outputListEl.text(data[i].name + ", " + data[i].country);
                     }
-                    outputListEl.addClass('search-result')
+                    outputListEl.addClass('search-result');
                     outputListEl.attr('lon', data[i].lon);
                     outputListEl.attr('lat', data[i].lat);
                     searchOutputEl.append(outputListEl);
