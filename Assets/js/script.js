@@ -2,7 +2,9 @@ const apiKey = "3f72ddeed10ffe4814723bf1b93c4536";
 const searchStringEl = $('#search-string');
 const searchOutputEl = $('#search-output');
 const currentCityEl = $('#current-city');
-const searchHistoryEl = $('#search-history');
+const searchHistoryListEl = $('#search-history-list');
+
+// gets the search history from local storage, or creates it
 let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
 
@@ -53,11 +55,20 @@ function createWeatherTileEl(data, num) {
     return weatherEl;
 }
 
+// sends the contents of the search box to the geocoding api and displays results in real time below the search box.
+// puts the lon/lat into the html attribute for each result to be passed to the request for weather data
 function submitData() {
+
+    // grab the input
     inputValue = searchStringEl.val();
+    
+    // if it's 2 or less, don't send it yet. 3 characters is a single character plus a comma plus a space, which should cover all cases.
     if (inputValue.length < 3) {
         return;
     }
+
+    // if it's 3 or more, send the request.
+    // Limited to 5 responses.
     const apiGeocodingURL = `https://api.openweathermap.org/geo/1.0/direct?q=${inputValue}&limit=5&appid=${apiKey}`
     fetch(apiGeocodingURL)
         .then(function (response) {
@@ -65,9 +76,15 @@ function submitData() {
         })
         .then(function (data) {
             if (data.length > 0) {
+
+                // clear out previous results
                 searchOutputEl.empty();
+
+                // render the results as div elements appended to the search box with the lat/lon as html attributes of the elements.
                 for (let i = 0; i < data.length; ++i) {
                     const outputListEl = $('<div>');
+
+                    // logic for displaying states if the attribute exists
                     if (data[i].state) {
                         outputListEl.text(data[i].name + ", " + data[i].state + ", " + data[i].country);
                     }
@@ -84,6 +101,7 @@ function submitData() {
         });
 }
 
+// looks for the user to press enter on the search box and sends the first result to the weather api
 function handleKeydown(event) {
     if (event.key === 'Enter') {
         const result = $('.search-result[num="0"]')
@@ -91,16 +109,19 @@ function handleKeydown(event) {
     }
 }
 
+// looks for user to click on one of the search results
 function handleClick() {
     const selectedEl = $(this);
     return getWeatherData(selectedEl.text(), [selectedEl.attr("lat"), selectedEl.attr("lon")]);
 }
 
+// render the search history from local storage
 function showSearchHistory() {
 
     // empty out any previous history being displayed
-    searchHistoryEl.empty();
+    searchHistoryListEl.empty();
 
+    // creates an html element for each item in local storage with the city name and coordinates as html attributes
     for (let i = 0; i < searchHistory.length; ++i) {
         const item = searchHistory[i];
         const searchHistoryItemEl = $('<div>');
@@ -109,32 +130,41 @@ function showSearchHistory() {
         searchHistoryItemEl.attr('num', i);
         searchHistoryItemEl.attr('lat', item['coordinates'][0]);
         searchHistoryItemEl.attr('lon', item['coordinates'][1]);
-        searchHistoryEl.append(searchHistoryItemEl);
+        searchHistoryListEl.append(searchHistoryItemEl);
     }
 }
 
+// puts the city and coordinates into local storage, limits the number of items that can be saved
 function addSearchHistory(city, coordinates) {
     searchHistory.unshift({ city, coordinates});
-    const maxSearchHistory = 5;
+    const maxSearchHistory = 20;
     searchHistory = searchHistory.slice(0, maxSearchHistory);
     localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
     return showSearchHistory();
 }
 
+// stores city/coordinates in local storage, sends coordinates to weather api and retrieves weather data, then renders the weather section html.
 function getWeatherData(city, coordinates) {
+
+    // clean up dynamically rendered html
     searchOutputEl.empty();
     currentCityEl.empty();
     searchStringEl.val('');
+
+    // save parameters to local storage
     addSearchHistory(city, coordinates);
+
+    // assign variables for url string interpolation
     const latSelect = coordinates[0];
     const lonSelect = coordinates[1];
     const apiWeatherURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${latSelect}&lon=${lonSelect}&units=imperial&appid=${apiKey}`;
+    
+    // call the url and process the data
     fetch (apiWeatherURL)
         .then(function (response) {
             return response.json();
         })
         .then(function (data) {
-            console.log(data);
 
             // display city name
             const cityNameEl = $('<h2>');
@@ -160,11 +190,14 @@ function getWeatherData(city, coordinates) {
         })
 }
 
+// event handler to send input to geolocation service as user types
 searchStringEl.on("input", submitData)
 
+// event handler for clicking on search results
 searchOutputEl.on("click", ".search-result", handleClick)
 
-searchHistoryEl.on("click", ".search-history-item", handleClick)
+// event handler for search history list, uses the same response as clicking a search item
+searchHistoryListEl.on("click", ".search-history-item", handleClick)
 
 // checking if they pressed enter
 searchStringEl.on("keydown", handleKeydown);
