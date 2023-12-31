@@ -7,9 +7,25 @@
     <title>Weather Vain</title>
 </head>
 <body>
-    <input id="search-string" type="text" placeholder="Start typing a city name">
-    <div id="search-output">
+    <header id="title">
+        <h1>Weather Vain</h1>
+        <h3>We have the best weather!</h3>
+        <p>
+            Simply type a city name into the search box below, then click on the desired result or press enter to select the first result.
+        </p>
+    </header>
+    <div id="search">
+        <input id="search-string" type="text" placeholder="Start typing a city name">
+        <div id="search-output"></div>
     </div>
+    <div id="weather">
+        <div id="current-city"></div>
+        <div id="current-conditions"></div>
+        <br>
+        <div id="next-5-conditions"></div>
+    </div>
+    <aside id="search-history">
+    </aside>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="./Assets/js/script.js"></script>
 </body>
